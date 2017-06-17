@@ -5,7 +5,7 @@
  * @version 0.1
  */
 
-import java.util.*;
+import java.util.*; //VER SI HAY QUE ELIMINAR
 import java.io.*;
 
 public class PathagonProblem implements AdversarySearchProblem<PathagonState> {
@@ -75,9 +75,8 @@ public class PathagonProblem implements AdversarySearchProblem<PathagonState> {
      * @pre true
      * @post true si hubo un ganador en ese estado
      */
-    public boolean win(PathagonState state){
-        boolean winner = false;
-        return winner;    
+    public boolean win(PathagonState state, int color){
+        return state.searchPath(color);    
 
     }
 
@@ -89,7 +88,7 @@ public class PathagonProblem implements AdversarySearchProblem<PathagonState> {
      * @post true si termino el juego.
      */
     public boolean end(PathagonState state){
-        return ((state.getPieces() == 28) || win(state));
+        return ((state.getPieces() == 28) || win(state,0) || win(state,1)) ;
 
     }
 
@@ -103,16 +102,16 @@ public class PathagonProblem implements AdversarySearchProblem<PathagonState> {
      */    
     public int value(PathagonState state){
         int val;
-        boolean anyWinner = win(state);
-        if(anyWinner){
-            if(state.isMax())
-                val = -50;
-            else
-                val = 50;
-        }else{
-            val = 0;
+        int color; 
+        if (state.isMax() && win(state,1)){
+            System.out.println("La IA ha ganado...");
+            return minValue();
         }
-        return val;
+        else if (!state.isMax() && win(state,0)){
+            return maxValue();
+        }
+        else
+            return 0;
     }
 
     /**

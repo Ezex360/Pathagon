@@ -38,4 +38,16 @@ public class Pair implements Serializable {
 	return y;
     }
 
+    //Sobre-escribe la clase equals para la comparacion de pares.
+     @Override
+    public boolean equals(Object other) {
+        if (other == this) 
+            return true;
+        if(other == null || other.getClass() != this.getClass())
+            return false;
+
+        Pair p = (Pair) other;
+        return this.x==p.x && this.y==p.y;
+    }
+
 } // end of class Pair

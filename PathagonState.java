@@ -5,6 +5,7 @@
  */
 import java.util.List;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.io.*;
 
 public class PathagonState implements AdversarySearchState, Serializable {
@@ -15,6 +16,7 @@ public class PathagonState implements AdversarySearchState, Serializable {
     private List<Pair> blocked; // Lista con los lugares bloqueados
     private int turn; //Numero de turno
     private int pieces; //Cantidad de piezas en el tablero
+    private List<Pair> visited; //Se utiliza para hacer el recorrido de caminos
 
     /**
      * Constructor de la clase
@@ -74,32 +76,6 @@ public class PathagonState implements AdversarySearchState, Serializable {
     }
 
     /**
-     * Elimina una ficha del tablero, la inserta en la lista de movimientos
-     * no validos y resta en 1 la cantidad de piezas
-     * @param i,j representan la posicion de la ficha a remover
-     * @pre 0 <= i,j <= 6
-     * @post true si se pudo eliminar la ficha.
-     */
-    public boolean removePiece(int i,int j){
-        boolean removed = false;
-        try{
-            if(board[i][j] != -1){            
-                board[i][j] = -1;
-                pieces--;
-                Pair rm = new Pair(i,j);
-                blocked.add(rm);
-                removed = true;
-            }
-            else
-                throw new IllegalArgumentException();
-        }catch(IllegalArgumentException e){System.err.println("Movimiento no valido");}
-        if (removed)
-            System.out.println("Se elimino una ficha del tablero!");
-        return removed;
-
-    }
-
-    /**
      * Devuelve la ficha que se encuentra en una determinada posicion
      * @param i,j representan la posicion de la ficha a devolver
      * @pre 0 <= i,j <= 6
@@ -136,6 +112,32 @@ public class PathagonState implements AdversarySearchState, Serializable {
                 res = -1;
         }catch(IllegalArgumentException e){System.err.println("Movimiento no valido");}
         return res;
+    }
+
+    /**
+     * Elimina una ficha del tablero, la inserta en la lista de movimientos
+     * no validos y resta en 1 la cantidad de piezas
+     * @param i,j representan la posicion de la ficha a remover
+     * @pre 0 <= i,j <= 6
+     * @post true si se pudo eliminar la ficha.
+     */
+    public boolean removePiece(int i,int j){
+        boolean removed = false;
+        try{
+            if(board[i][j] != -1){            
+                board[i][j] = -1;
+                pieces--;
+                Pair rm = new Pair(i,j);
+                blocked.add(rm);
+                removed = true;
+            }
+            else
+                throw new IllegalArgumentException();
+        }catch(IllegalArgumentException e){System.err.println("Movimiento no valido");}
+        if (removed)
+            System.out.println("Se elimino una ficha del tablero!");
+        return removed;
+
     }
 
     /**
@@ -232,6 +234,115 @@ public class PathagonState implements AdversarySearchState, Serializable {
         return print;
 		
 	} 
+
+    /** 
+     * A partir de un tipo de ficha recorre todos los posibles caminos
+     * para saber si ese color salio victorioso.
+     * @param move indica el color de la ficha a buscar el camino
+     * @pre. true
+     * @post. true si se encontro un camino victorioso para las fichas de un
+     * determinado color
+     */     
+    public boolean searchPath(int move) {
+        
+        //Inicializo la lista de fichas iniciales a buscar caminos
+        List<Pair> initialMoves = new ArrayList<Pair>();
+        //Relleno la lista de lugares iniciales.
+        for(int n=0;n<7;n++){
+            if(move == 0 && board[0][n]==0){
+                Pair initial = new Pair(0,n);
+                initialMoves.add(initial);
+            }
+            else if(move == 1 && board[n][0]==1){
+                Pair initial = new Pair(n,0);
+                initialMoves.add(initial);
+            }else if(move!=0 && move!=1)
+                throw new IllegalArgumentException("Color invalido");
+
+        }
+
+        boolean result = false;
+        System.out.println("Initial moves size = "+initialMoves.size()+" Color "+move);
+        for (int n=0;n<initialMoves.size();n++){
+            //Vacio la lista de visitados
+            visited = new LinkedList<Pair>();
+            if (result){
+                break;
+            }
+            result = breadthFirst(initialMoves.get(n), move);
+            for(int x=0;x<visited.size();x++){
+                System.out.println("("+visited.get(x).fst()+","+visited.get(x).snd()+") Color "+move);
+            }
+            System.out.println();
+
+        }
+        return result;
+        
+    } 
+
+    /** 
+     * A partir de un par, indicando el lugar en el tablero, obtiene todas
+     * las fichas adyacentes del mismo color
+     * @param place indica la posicion de la pieza en el tablero
+     * @param color indica el color de la pieza
+     * @pre. 0 <= place.fst(),place.snd() < 7, color in {0,1}
+     * @post. Lista de pares que contienen las fichas del mismo color
+     * que son adyacentes a la indicada en parametro
+     */  
+    private List<Pair> next(Pair place, int color){
+        List<Pair> ret = new ArrayList<Pair>();
+        int i = place.fst();
+        int j = place.snd();
+        if(insideBoard(i+1) && board[i][j]==color && board[i][j]==board[i+1][j]){
+            Pair down = new Pair(i+1,j);
+            ret.add(down);
+        }
+        if(insideBoard(i-1) && board[i][j]==color && board[i][j]==board[i-1][j]){
+            Pair up = new Pair(i-1,j);
+            ret.add(up);
+        }
+        if(insideBoard(j+1) && board[i][j]==color && board[i][j]==board[i][j+1]){
+            Pair right = new Pair(i,j+1);
+            ret.add(right);
+        }
+        if(insideBoard(j-1) && board[i][j]==color && board[i][j]==board[i][j-1]){
+            Pair left = new Pair(i,j-1);
+            ret.add(left);
+        }
+        return ret;
+    }
+
+    /** 
+     * Realiza el recorrido Breadth First para encontrar un camino ganador
+     * para un determinado color a partir de un lugar inicial en el tablero.
+     * @param place indica la posicion inicial para realizar el recorrido
+     * @param color indica el color de las fichas a recorrer
+     * @pre. 0 <= place.fst(),place.snd() < 7, color in {0,1}
+     * @post. true si se encontro un camino victorioso para las fichas de un
+     * determinado color partiendo de places
+     */  
+    private boolean breadthFirst(Pair place, int color){
+    List<Pair> queqe = new LinkedList<Pair>();
+    queqe.add(place);
+    while(!queqe.isEmpty()){
+        Pair aux = queqe.remove(0);
+        visited.add(aux);
+        if (color==0 && aux.fst()==6)
+            return true;
+        if (color==1 && aux.snd()==6)
+            return true;
+        List<Pair> succ = next(aux,color);
+        while( !succ.isEmpty() ){
+            Pair child = succ.remove(0);
+            if (!visited.contains(child)) 
+                queqe.add(child);
+        }
+
+    }
+    return false;
+
+    }       
+
 
     /**
      * Retorna el elemento con la regla aplicada
