@@ -146,35 +146,37 @@ public class PathagonState implements AdversarySearchState, Serializable {
      */
     public boolean addPiece(int i,int j,int move){
         boolean inserted = false;
-        try{
-            //Insertar Ficha.
-            int up = i-2;
-            int down = i+2;
-            int left = j-2;
-            int right = j+2;
-            if(board[i][j] == -1){
-                for(int n=0;n<blocked.size();n++){
-                    Pair rm = blocked.get(n);
-                    if (i == rm.fst() && j == rm.snd())
-                        throw new IllegalArgumentException();
-                }
-                pieces++;
-                board[i][j]=move;
-                inserted = true;
-            }else throw new IllegalArgumentException();
-            cleanBlocked();
-            //Remover piezas encerradas.
-            if(insideBoard(up) && move==counter(i-1,j) && board[i][j]==board[up][j])                
-                removePiece(i-1,j);
-            if(insideBoard(down) && move==counter(i+1,j) && board[i][j]==board[down][j])                
-                removePiece(i+1,j);
-            if(insideBoard(left) && move==counter(i,j-1) && board[i][j]==board[i][left])                
-                removePiece(i,j-1);
-            if(insideBoard(right) && move==counter(i,j+1) && board[i][j]==board[i][right])                
-                removePiece(i,j+1);
-        }catch(IllegalArgumentException e){/*System.err.println("Movimiento no valido");*/}
-        if (inserted)
-            addTurn();
+        if(insideBoard(i) && insideBoard(j)){
+            try{
+                //Insertar Ficha.
+                int up = i-2;
+                int down = i+2;
+                int left = j-2;
+                int right = j+2;
+                if(board[i][j] == -1){
+                    for(int n=0;n<blocked.size();n++){
+                        Pair rm = blocked.get(n);
+                        if (i == rm.fst() && j == rm.snd())
+                            throw new IllegalArgumentException();
+                    }
+                    pieces++;
+                    board[i][j]=move;
+                    inserted = true;
+                }else throw new IllegalArgumentException();
+                cleanBlocked();
+                //Remover piezas encerradas.
+                if(insideBoard(up) && move==counter(i-1,j) && board[i][j]==board[up][j])                
+                    removePiece(i-1,j);
+                if(insideBoard(down) && move==counter(i+1,j) && board[i][j]==board[down][j])                
+                    removePiece(i+1,j);
+                if(insideBoard(left) && move==counter(i,j-1) && board[i][j]==board[i][left])                
+                    removePiece(i,j-1);
+                if(insideBoard(right) && move==counter(i,j+1) && board[i][j]==board[i][right])                
+                    removePiece(i,j+1);
+            }catch(IllegalArgumentException e){/*System.err.println("Movimiento no valido");*/}
+            if (inserted)
+                addTurn();
+        }
         return inserted;
 
     }

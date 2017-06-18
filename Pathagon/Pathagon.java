@@ -39,12 +39,18 @@ public class Pathagon {
         AdversarySearchEngine machine = new MinMaxAlphaBetaEngine(pathagon,level);
         while(!pathagon.end(game)){
             if(!pathagon.end(game)){
-                clearScreen();
-                System.out.println("Su Turno");
-                System.out.println(game.toString());
-                int x = move("X");
-                int y = move("Y");
-                game.addPiece(x,y,0);
+                boolean ok = false;
+                while(!ok){
+                    clearScreen();
+                    System.out.println("Su Turno");
+                    System.out.println(game.toString());
+                    int x = -1; int y = -1;
+                    try{
+                        x = move("X");
+                        y = move("Y");
+                    }catch(IllegalArgumentException e){System.err.println("Entrada erronea/Movimiento invalido");}
+                    ok = game.addPiece(x,y,0);
+                }
             }
             clearScreen();
             if(!pathagon.end(game)){
@@ -53,6 +59,7 @@ public class Pathagon {
             }
         }
         System.out.println(game.toString());
+        System.out.println("Fin del juego");
     }
     
     private static void vsPlayer(){
@@ -78,6 +85,7 @@ public class Pathagon {
             clearScreen();
         }
         System.out.println(game.toString());
+        System.out.println("Fin del juego");
     }
     
     //Funcion para leer movimiento

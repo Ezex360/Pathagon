@@ -59,11 +59,11 @@ public class PathagonProblem implements AdversarySearchProblem<PathagonState> {
             for (int j=0;j<7;j++) {
                 PathagonState newState = (PathagonState) deepClone(s);
                 if(newState.addPiece(i,j,move)){
-                    clearScreen();
-                    System.out.println("Turno de la IA");
-                    System.out.println(newState.toString());
-                    successors.add(newState);
+                    //Descomentar para ver por pantalla los estados que tiene en cuenta la IA
+                    //clearScreen();
+                    //System.out.println("Turno de la IA");
                     //System.out.println(newState.toString());
+                    successors.add(newState);
                 }                
             }
         }  
@@ -121,7 +121,7 @@ public class PathagonProblem implements AdversarySearchProblem<PathagonState> {
      * para el PathagonProblem
      */ 
     public int minValue(){
-        return -50;
+        return -70;
     }
 
     /**
@@ -129,7 +129,7 @@ public class PathagonProblem implements AdversarySearchProblem<PathagonState> {
      * para el PathagonProblem
      */ 
     public int maxValue(){
-        return 50;
+        return 70;
     }
 
     /**
