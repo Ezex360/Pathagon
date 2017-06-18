@@ -59,6 +59,9 @@ public class PathagonProblem implements AdversarySearchProblem<PathagonState> {
             for (int j=0;j<7;j++) {
                 PathagonState newState = (PathagonState) deepClone(s);
                 if(newState.addPiece(i,j,move)){
+                    clearScreen();
+                    System.out.println("Turno de la IA");
+                    System.out.println(newState.toString());
                     successors.add(newState);
                     //System.out.println(newState.toString());
                 }                
@@ -104,7 +107,6 @@ public class PathagonProblem implements AdversarySearchProblem<PathagonState> {
         int val;
         int color; 
         if (state.isMax() && win(state,1)){
-            System.out.println("La IA ha ganado...");
             return minValue();
         }
         else if (!state.isMax() && win(state,0)){
@@ -147,6 +149,13 @@ public class PathagonProblem implements AdversarySearchProblem<PathagonState> {
             return null;
         }
     }
+
+
+    //Funcion para limpiar la pantalla
+    public static void clearScreen() {  
+        System.out.print("\033[H\033[2J");  
+        System.out.flush();  
+    } 
 
 
 }

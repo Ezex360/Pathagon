@@ -39,6 +39,7 @@ public class Pathagon {
         AdversarySearchEngine machine = new MinMaxAlphaBetaEngine(pathagon,level);
         while(!pathagon.end(game)){
             if(!pathagon.end(game)){
+                clearScreen();
                 System.out.println("Su Turno");
                 System.out.println(game.toString());
                 int x = move("X");
@@ -96,7 +97,7 @@ public class Pathagon {
     }
 
     //Funcion para limpiar la pantalla
-        public static void clearScreen() {  
+    public static void clearScreen() {  
         System.out.print("\033[H\033[2J");  
         System.out.flush();  
     }  

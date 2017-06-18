@@ -134,8 +134,6 @@ public class PathagonState implements AdversarySearchState, Serializable {
             else
                 throw new IllegalArgumentException();
         }catch(IllegalArgumentException e){System.err.println("Movimiento no valido");}
-        if (removed)
-            System.out.println("Se elimino una ficha del tablero!");
         return removed;
 
     }
@@ -174,7 +172,7 @@ public class PathagonState implements AdversarySearchState, Serializable {
                 removePiece(i,j-1);
             if(insideBoard(right) && move==counter(i,j+1) && board[i][j]==board[i][right])                
                 removePiece(i,j+1);
-        }catch(IllegalArgumentException e){System.err.println("Movimiento no valido");}
+        }catch(IllegalArgumentException e){/*System.err.println("Movimiento no valido");*/}
         if (inserted)
             addTurn();
         return inserted;
@@ -262,7 +260,6 @@ public class PathagonState implements AdversarySearchState, Serializable {
         }
 
         boolean result = false;
-        System.out.println("Initial moves size = "+initialMoves.size()+" Color "+move);
         for (int n=0;n<initialMoves.size();n++){
             //Vacio la lista de visitados
             visited = new LinkedList<Pair>();
@@ -270,11 +267,6 @@ public class PathagonState implements AdversarySearchState, Serializable {
                 break;
             }
             result = breadthFirst(initialMoves.get(n), move);
-            for(int x=0;x<visited.size();x++){
-                System.out.println("("+visited.get(x).fst()+","+visited.get(x).snd()+") Color "+move);
-            }
-            System.out.println();
-
         }
         return result;
         
