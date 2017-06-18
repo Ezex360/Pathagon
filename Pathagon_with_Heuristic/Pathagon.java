@@ -67,35 +67,22 @@ public class Pathagon {
         PathagonProblem pathagon = new PathagonProblem();
         PathagonState game = pathagon.initialState();
         while(!pathagon.end(game)){
-            if(!pathagon.end(game)){
-                boolean ok = false;
-                while(!ok){
-                    clearScreen();
-                    System.out.println("Jugador 1 / 0");
-                    System.out.println(game.toString());
-                    int i = -1; int j = -1;
-                    try{
-                        i = move("X");
-                        j = move("Y");
-                    }catch(IllegalArgumentException e){System.err.println("Entrada erronea/Movimiento invalido");}
-                    ok = game.addPiece(i,j,0);
-                }
-            }
+            
+                System.out.println("Jugador 1 / 0");
+                System.out.println(game.toString());
+                int x = move("X");
+                int y = move("Y");
+                game.addPiece(x,y,0);
+            
             clearScreen();
-            if(!pathagon.end(game)){
-                boolean ok = false;
-                while(!ok){
-                    clearScreen();
-                    System.out.println("Jugador 2 / X");
-                    System.out.println(game.toString());
-                    int x = -1; int y = -1;
-                    try{
-                        x = move("X");
-                        y = move("Y");
-                    }catch(IllegalArgumentException e){System.err.println("Entrada erronea/Movimiento invalido");}
-                    ok = game.addPiece(x,y,1);
-                }
-            }
+            
+                System.out.println("Jugador 2 / X");
+                System.out.println(game.toString());
+                int i = move("X");
+                int j = move("Y");
+                game.addPiece(i,j,1);
+            
+            clearScreen();
         }
         System.out.println(game.toString());
         System.out.println("Fin del juego");
