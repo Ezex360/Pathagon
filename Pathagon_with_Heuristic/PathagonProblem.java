@@ -79,12 +79,12 @@ public class PathagonProblem implements AdversarySearchProblem<PathagonState> {
      * @post true si hubo un ganador en ese estado
      */
     public boolean win(PathagonState state, int color){
-        boolean res = false;
-        if (color == 0 && (state.searchPath(color) == -70))
-            res = true;
-        if (color == 1 && (state.searchPath(color) == 70))
-            res = true;
-        return res;    
+        if (color == 1 && state.searchPath(color) == -7)
+            return  true;
+        else if (color == 0 && state.searchPath(color) == 7)
+            return  true;
+        else
+            return false;
 
     }
 
@@ -96,7 +96,7 @@ public class PathagonProblem implements AdversarySearchProblem<PathagonState> {
      * @post true si termino el juego.
      */
     public boolean end(PathagonState state){
-        return ((state.getPieces() == 28) || win(state,0) || win(state,1)) ;
+        return ((state.getPieces() == 28) || win(state,0) || win(state,1));
 
     }
 
@@ -109,14 +109,12 @@ public class PathagonProblem implements AdversarySearchProblem<PathagonState> {
      * @post true si termino el juego.
      */    
     public int value(PathagonState state){
-        if (state.isMax()){
-            return state.searchPath(1);
-        }
-        else if (!state.isMax()){
-            return state.searchPath(0);
-        }
-        else
-            return 0;
+        if (state.isMax())
+            return state.searchPath(1) * 10;
+        else 
+            return state.searchPath(0) * 10;
+        
+
     }
 
     /**

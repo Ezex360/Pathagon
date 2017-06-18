@@ -236,49 +236,6 @@ public class PathagonState implements AdversarySearchState, Serializable {
 	} 
 
     /** 
-     * A partir de un tipo de ficha recorre todos los posibles caminos
-     * para saber si ese color salio victorioso.
-     * @param move indica el color de la ficha a buscar el camino
-     * @pre. true
-     * @post. true si se encontro un camino victorioso para las fichas de un
-     * determinado color
-     */     
-    public int searchPath(int move) {
-        
-        //Inicializo la lista de fichas iniciales a buscar caminos
-        List<Pair> initialMoves = new ArrayList<Pair>();
-        //Relleno la lista de lugares iniciales.
-        for(int n=0;n<7;n++){
-            if(move == 0 && board[0][n]==0){
-                Pair initial = new Pair(0,n);
-                initialMoves.add(initial);
-            }
-            else if(move == 1 && board[n][0]==1){
-                Pair initial = new Pair(n,0);
-                initialMoves.add(initial);
-            }else if(move!=0 && move!=1)
-                throw new IllegalArgumentException("Color invalido");
-
-        }
-
-        int result = 0;
-        for (int n=0;n<initialMoves.size();n++){
-            //Vacio la lista de visitados
-            visited = new LinkedList<Pair>();
-            int temp = breadthFirst(initialMoves.get(n), move);
-            if (move==0 && temp<result){
-                result = temp;
-            }
-            if (move==1 && result<temp){
-                result = temp;
-            }
-        }
-        result = result * 10;
-        return result;
-        
-    } 
-
-    /** 
      * A partir de un par, indicando el lugar en el tablero, obtiene todas
      * las fichas adyacentes del mismo color
      * @param place indica la posicion de la pieza en el tablero
@@ -311,6 +268,49 @@ public class PathagonState implements AdversarySearchState, Serializable {
     }
 
     /** 
+     * A partir de un tipo de ficha recorre todos los posibles caminos
+     * para saber si ese color salio victorioso.
+     * @param move indica el color de la ficha a buscar el camino
+     * @pre. true
+     * @post. true si se encontro un camino victorioso para las fichas de un
+     * determinado color
+     */     
+    public int searchPath(int move) {
+        
+        //Inicializo la lista de fichas iniciales a buscar caminos
+        List<Pair> initialMoves = new ArrayList<Pair>();
+        //Relleno la lista de lugares iniciales.
+        for(int n=0;n<7;n++){
+            if(move == 0 && board[0][n]==0){
+                Pair initial = new Pair(0,n);
+                initialMoves.add(initial);
+            }
+            else if(move == 1 && board[n][0]==1){
+                Pair initial = new Pair(n,0);
+                initialMoves.add(initial);
+            }else if(move!=0 && move!=1)
+                throw new IllegalArgumentException("Color invalido");
+
+        }
+
+        int result = 0;
+        for (int n=0;n<initialMoves.size();n++){
+            //Vacio la lista de visitados
+            visited = new LinkedList<Pair>();
+            if (result==7){
+                break;
+            }
+            int temp = breadthFirst(initialMoves.get(n), move);
+            if (temp>result)
+                result=temp;
+        }
+        if(move==1)
+            result = result * -1;
+        return result;
+        
+    } 
+
+    /** 
      * Realiza el recorrido Breadth First para encontrar un camino ganador
      * para un determinado color a partir de un lugar inicial en el tablero.
      * @param place indica la posicion inicial para realizar el recorrido
@@ -327,13 +327,13 @@ public class PathagonState implements AdversarySearchState, Serializable {
         Pair aux = queqe.remove(0);
         visited.add(aux);
         if (color==0 && aux.fst()==6)
-            return -7;
-        else if(color == 0 && aux.fst()>Math.abs(result))
-            result = aux.fst() * -1;
+            return 7;
+        if (color==0 && result < aux.fst()+1)
+            result = aux.fst();
         if (color==1 && aux.snd()==6)
             return 7;
-        else if(color == 0 && aux.snd()>result)
-            result = aux.snd();
+        if (color==1 && result < aux.snd()+1)
+             result = aux.snd();
         List<Pair> succ = next(aux,color);
         while( !succ.isEmpty() ){
             Pair child = succ.remove(0);
