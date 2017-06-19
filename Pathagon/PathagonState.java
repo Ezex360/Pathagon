@@ -1,7 +1,7 @@
 /**
  * Clase que implementa los estados del juego Pathagon    
  * @author Gardiola Joaquin y Giachero Ezequiel
- * @version 0.1
+ * @version 0.3
  */
 import java.util.List;
 import java.util.ArrayList;
@@ -236,45 +236,6 @@ public class PathagonState implements AdversarySearchState, Serializable {
 	} 
 
     /** 
-     * A partir de un tipo de ficha recorre todos los posibles caminos
-     * para saber si ese color salio victorioso.
-     * @param move indica el color de la ficha a buscar el camino
-     * @pre. true
-     * @post. true si se encontro un camino victorioso para las fichas de un
-     * determinado color
-     */     
-    public boolean searchPath(int move) {
-        
-        //Inicializo la lista de fichas iniciales a buscar caminos
-        List<Pair> initialMoves = new ArrayList<Pair>();
-        //Relleno la lista de lugares iniciales.
-        for(int n=0;n<7;n++){
-            if(move == 0 && board[0][n]==0){
-                Pair initial = new Pair(0,n);
-                initialMoves.add(initial);
-            }
-            else if(move == 1 && board[n][0]==1){
-                Pair initial = new Pair(n,0);
-                initialMoves.add(initial);
-            }else if(move!=0 && move!=1)
-                throw new IllegalArgumentException("Color invalido");
-
-        }
-
-        boolean result = false;
-        for (int n=0;n<initialMoves.size();n++){
-            //Vacio la lista de visitados
-            visited = new LinkedList<Pair>();
-            if (result){
-                break;
-            }
-            result = breadthFirst(initialMoves.get(n), move);
-        }
-        return result;
-        
-    } 
-
-    /** 
      * A partir de un par, indicando el lugar en el tablero, obtiene todas
      * las fichas adyacentes del mismo color
      * @param place indica la posicion de la pieza en el tablero
@@ -307,24 +268,130 @@ public class PathagonState implements AdversarySearchState, Serializable {
     }
 
     /** 
+     * A partir de un tipo de ficha recorre todos los posibles caminos que inician
+     * desde los bordes del mismo color de esta para saber si ese color salio victorioso.
+     * @param move indica el color de la ficha a buscar el camino
+     * @pre. true
+     * @post. true si se encontro un camino victorioso para las fichas de un
+     * determinado color
+     */     
+    public int searchPath(int move) {
+        
+        //Inicializo la lista de fichas iniciales a buscar caminos
+        List<Pair> initialMoves = new ArrayList<Pair>();
+        //Relleno la lista de lugares iniciales iniciando desde el primer borde. (Arriba o Izquierda)
+        //Incremento zero para saber la cantidad de lugares iniciales desde el primer borde hay
+        int zero=0;
+        for(int n=0;n<7;n++){
+            if(move == 0 && board[0][n]==0){
+                zero++;
+                Pair initial = new Pair(0,n);
+                initialMoves.add(initial);
+            }
+            else if(move == 1 && board[n][0]==1){
+                zero++;
+                Pair initial = new Pair(n,0);
+                initialMoves.add(initial);
+            }else if(move!=0 && move!=1)
+                throw new IllegalArgumentException("Color invalido");
+            
+        }
+        //Relleno la lista de lugares iniciales iniciando desde el segundo borde. (Abajo o Derecha)
+        for(int n=0;n<7;n++){
+            if(move == 0 && board[6][n]==0){
+                Pair initial = new Pair(6,n);
+                initialMoves.add(initial);
+            }
+            else if(move == 1 && board[n][6]==1){
+                Pair initial = new Pair(n,6);
+                initialMoves.add(initial);
+            }else if(move!=0 && move!=1)
+                throw new IllegalArgumentException("Color invalido");
+
+        }
+
+        int temp; //Almacena los resultados parciales
+        int result = 0; //Almacena los resultados finales
+        for (int n=0;n<initialMoves.size();n++){
+            //Vacio la lista de visitados
+            visited = new LinkedList<Pair>();
+            //Si se encuentra un camino ganador, se detiene.
+            if (result==7){
+                break;
+            }
+            //Mientras que zero sea positivo, se analizan los comienzos del primer borde (Arriba o Izquierda).
+            if(zero>0){
+                zero--;
+                temp = breadthFirst(initialMoves.get(n), move,6);
+            //Cuando zero no es positivo, se analizan los comienzos desde los bordes restantes (Abajo o Derecha).
+            }else{
+                temp = breadthFirst(initialMoves.get(n), move,0);
+                //Al resultado le resto 7 para obtener la cantidad de piezas movimientos horizontales o verticales
+                //que se alejo desde el borde inferior o lateral derecho.
+                temp = 7 - temp;
+            }
+            //Almaceno en result el camino con recorrido mas largo encontrado.
+            if (temp>result)
+                result=temp;
+        }
+        //Si es el color de la IA, multiplico por -1
+        if(move==1)
+            result = result * -1;
+        return result;
+        
+    } 
+
+    /** 
      * Realiza el recorrido Breadth First para encontrar un camino ganador
-     * para un determinado color a partir de un lugar inicial en el tablero.
+     * para un determinado color a partir de un lugar inicial en el tablero y
+     * teniendo en cuenta el lugar donde debe finalizar el recorrido.
      * @param place indica la posicion inicial para realizar el recorrido
      * @param color indica el color de las fichas a recorrer
+     * @param end indica la posicion final del recorrido
      * @pre. 0 <= place.fst(),place.snd() < 7, color in {0,1}
      * @post. true si se encontro un camino victorioso para las fichas de un
-     * determinado color partiendo de places
+     * determinado color partiendo de place y terminando en cualquiera de las
+     * filas o columnas end (dependiendo del color).
      */  
-    private boolean breadthFirst(Pair place, int color){
+    private int breadthFirst(Pair place, int color,int end){
+    //Inicializo la cola
     List<Pair> queqe = new LinkedList<Pair>();
+    //Agrego el primer elemento a la cola.
     queqe.add(place);
+    //Inicializo result
+    int result;
+    if(end == 6)
+        result = 0;
+    else if(end == 0)
+        result = 6;
+    else
+        throw new IllegalArgumentException("End invalido");
+    //Tratamiento BreadFirst
     while(!queqe.isEmpty()){
+        //Obtengo el primer elemento de la cola
         Pair aux = queqe.remove(0);
         visited.add(aux);
-        if (color==0 && aux.fst()==6)
-            return true;
-        if (color==1 && aux.snd()==6)
-            return true;
+
+        //Trato los elementos.
+        //Compruebo si estoy en la ultima fila o columna.
+        if (color==0 && aux.fst()==end)
+            return 7;
+        if (color==1 && aux.snd()==end)
+            return 7;
+        //Analizo la distancia recorrida desde el primer borde, manteniendo la celda
+        //mas lejana a este encontrada
+        if (color==0 && end == 6 && result < aux.fst()+1)
+            result = aux.fst()+1;
+        if (color==1 && end == 6 && result < aux.snd()+1)
+             result = aux.snd()+1;
+        //Analizo la distancia recorrida desde el segundo borde, manteniendo
+        //la posicion de la celda del tablero mas alejada a este que se encontro
+        if (color==0 && end == 0 && result > aux.fst())
+            result = aux.fst();
+        if (color==1 && end == 0 && result > aux.snd())
+            result = aux.snd();
+
+        //Obtengo sucesores
         List<Pair> succ = next(aux,color);
         while( !succ.isEmpty() ){
             Pair child = succ.remove(0);
@@ -333,16 +400,17 @@ public class PathagonState implements AdversarySearchState, Serializable {
         }
 
     }
-    return false;
+    return result; //Retorno la posicion vertica u horizontal de la celda mas lejana a los bordes,
+    //para saber cual es el camino mas largo encontrado.
 
-    }       
+    }//end BreadFirst
 
 
     /**
      * Retorna el elemento con la regla aplicada
      */
-    public Integer ruleApplied(){
-        return 1;
+    public String ruleApplied(){
+        return "Busco el camino mas largo logrado desde los bordes correspondientes al color";
     };
 
 	

@@ -70,7 +70,7 @@ public class Pathagon {
             if(!pathagon.end(game)){
                 boolean ok = false;
                 while(!ok){
-                clearScreen();
+                    clearScreen();
                     System.out.println("Jugador 1 / 0");
                     System.out.println(game.toString());
                     int i = -1; int j = -1;
@@ -84,7 +84,7 @@ public class Pathagon {
             if(!pathagon.end(game)){
                 boolean ok = false;
                 while(!ok){
-                clearScreen();
+                    clearScreen();
                     System.out.println("Jugador 2 / X");
                     System.out.println(game.toString());
                     int x = -1; int y = -1;

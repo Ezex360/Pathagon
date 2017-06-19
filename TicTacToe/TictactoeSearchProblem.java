@@ -71,7 +71,7 @@ public class TictactoeSearchProblem implements AdversarySearchProblem<TictactoeS
     }
 
     public boolean end(TictactoeState state){
-        return ((state.getTurn() == 10) || win(state));
+        return ((state.getTurn() == 9) || win(state));
 
     }
 

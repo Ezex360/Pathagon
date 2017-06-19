@@ -1,0 +1,22 @@
+Trabajo practico numero 2
+Materia: Diseño de algoritmos - Algoritmos 2
+Integrantes:
+- Gardiola Joaquin  38418091
+- Giachero Ezequiel 39737931
+
+Ejercicio numero 1 - Utilizacion del Algoritmo Min Max con Poda Alpha Beta para generar
+una Inteligencia Artificial que permita jugar a Pathagon.
+
+La clase PhatagonState implemeta a AdversarySearchState
+La clase PhatagonProblem implemeta a AdversarySearchProblem
+La clase MinMaxAlphaBeta fue brindada para la realizacion de este proyecto, e implementa
+AdversarySearchEngine
+En la clase Phatagon se encuentran los metodos principales que permiten jugar contra la
+IA y jugar 1vs1
+
+Notas:
+- Las clases que implementan "Serializable" permiten hacer una Copia Profunda del objeto,
+esto se utiliza a la hora de obtener los sucesores de manera que no se haga referencia
+a un mismo objeto y se generen todos los estados de manera erronea.
+- Puede que la funcion clearScreen() no cumpla con su objetivo bajo ciertas versiones
+de Windows, sin embargo, no genera errores en ninguna de ellas.

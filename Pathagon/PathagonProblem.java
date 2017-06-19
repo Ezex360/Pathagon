@@ -2,10 +2,10 @@
  * Clase que implementa el problema de busqueda adversaria para el
  * juego Pathagon, obteniendo una IA que permita jugar a este.    
  * @author Gardiola Joaquin y Giachero Ezequiel
- * @version 0.1
+ * @version 0.2
  */
 
-import java.util.*; //VER SI HAY QUE ELIMINAR
+import java.util.*; 
 import java.io.*;
 
 public class PathagonProblem implements AdversarySearchProblem<PathagonState> {
@@ -59,7 +59,7 @@ public class PathagonProblem implements AdversarySearchProblem<PathagonState> {
             for (int j=0;j<7;j++) {
                 PathagonState newState = (PathagonState) deepClone(s);
                 if(newState.addPiece(i,j,move)){
-                    //Descomentar para ver por pantalla los estados que tiene en cuenta la IA
+                    //Descomentar para ver por pantalla los estados que tiene en cuenta la IA durante el juego.
                     //clearScreen();
                     //System.out.println("Turno de la IA");
                     //System.out.println(newState.toString());
@@ -71,15 +71,20 @@ public class PathagonProblem implements AdversarySearchProblem<PathagonState> {
     }
 
     /**
-     * Comprueba si existe un camino de fichas iguales desde un borde del
-     * tablero hacia otro, y que este camino este conectado horizontal y
+     * Comprueba si existe un camino de fichas iguales desde un borde del tablero
+     * hacia otro, y que este camino este conectado solo de manera horizontal y
      * verticalmente para saber si hubo un equipo ganador
      * @param s Estado a partir del cual comprobar si hay un ganador
      * @pre true
      * @post true si hubo un ganador en ese estado
      */
     public boolean win(PathagonState state, int color){
-        return state.searchPath(color);    
+        if (color == 1 && state.searchPath(color) == -7)
+            return  true;
+        else if (color == 0 && state.searchPath(color) == 7)
+            return  true;
+        else
+            return false;
 
     }
 
@@ -91,7 +96,7 @@ public class PathagonProblem implements AdversarySearchProblem<PathagonState> {
      * @post true si termino el juego.
      */
     public boolean end(PathagonState state){
-        return ((state.getPieces() == 28) || win(state,0) || win(state,1)) ;
+        return ((state.getPieces() == 28) || win(state,0) || win(state,1));
 
     }
 
@@ -104,16 +109,12 @@ public class PathagonProblem implements AdversarySearchProblem<PathagonState> {
      * @post true si termino el juego.
      */    
     public int value(PathagonState state){
-        int val;
-        int color; 
-        if (state.isMax() && win(state,1)){
-            return minValue();
-        }
-        else if (!state.isMax() && win(state,0)){
-            return maxValue();
-        }
-        else
-            return 0;
+        if (state.isMax())
+            return state.searchPath(1) * 10;
+        else 
+            return state.searchPath(0) * 10;
+        
+
     }
 
     /**
