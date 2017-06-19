@@ -29,9 +29,7 @@ public class TictactoeSearchProblem implements AdversarySearchProblem<TictactoeS
         for (int i=0;i<3;i++){
             for (int j=0;j<3;j++) {
                 TictactoeState newState = (TictactoeState) deepClone(s);
-                if(newState.getBoard(i,j) == -1){
-                    newState.setBoard(i,j,move);
-                    newState.addTurn();
+                if(newState.setBoard(i,j,move)){
                     successors.add(newState);
                     //System.out.println(newState.toString());
                 }                

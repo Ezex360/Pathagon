@@ -279,14 +279,30 @@ public class PathagonState implements AdversarySearchState, Serializable {
         
         //Inicializo la lista de fichas iniciales a buscar caminos
         List<Pair> initialMoves = new ArrayList<Pair>();
-        //Relleno la lista de lugares iniciales.
+        //Relleno la lista de lugares iniciales iniciando desde el primer borde.
+        int zero=0;
         for(int n=0;n<7;n++){
             if(move == 0 && board[0][n]==0){
+                zero++;
                 Pair initial = new Pair(0,n);
                 initialMoves.add(initial);
             }
             else if(move == 1 && board[n][0]==1){
+                zero++;
                 Pair initial = new Pair(n,0);
+                initialMoves.add(initial);
+            }else if(move!=0 && move!=1)
+                throw new IllegalArgumentException("Color invalido");
+            
+        }
+        //Relleno la lista de lugares iniciales iniciando desde el segundo borde.
+        for(int n=0;n<7;n++){
+            if(move == 0 && board[6][n]==0){
+                Pair initial = new Pair(6,n);
+                initialMoves.add(initial);
+            }
+            else if(move == 1 && board[n][6]==1){
+                Pair initial = new Pair(n,6);
                 initialMoves.add(initial);
             }else if(move!=0 && move!=1)
                 throw new IllegalArgumentException("Color invalido");
@@ -294,13 +310,20 @@ public class PathagonState implements AdversarySearchState, Serializable {
         }
 
         int result = 0;
+        int temp;
         for (int n=0;n<initialMoves.size();n++){
             //Vacio la lista de visitados
             visited = new LinkedList<Pair>();
             if (result==7){
                 break;
             }
-            int temp = breadthFirst(initialMoves.get(n), move);
+            if(zero>0){
+                zero--;
+                temp = breadthFirst(initialMoves.get(n), move,6);
+            }else{
+                temp = breadthFirst(initialMoves.get(n), move,0);
+                temp = 7 - temp;
+            }
             if (temp>result)
                 result=temp;
         }
@@ -315,25 +338,36 @@ public class PathagonState implements AdversarySearchState, Serializable {
      * para un determinado color a partir de un lugar inicial en el tablero.
      * @param place indica la posicion inicial para realizar el recorrido
      * @param color indica el color de las fichas a recorrer
+     * @param end indica la posicion final del recorrido
      * @pre. 0 <= place.fst(),place.snd() < 7, color in {0,1}
      * @post. true si se encontro un camino victorioso para las fichas de un
      * determinado color partiendo de places
      */  
-    private int breadthFirst(Pair place, int color){
+    private int breadthFirst(Pair place, int color,int end){
     List<Pair> queqe = new LinkedList<Pair>();
     queqe.add(place);
-    int result = 0;
+    int result;
+    if(end == 6)
+        result = 0;
+    else if(end == 0)
+        result = 6;
+    else
+        throw new IllegalArgumentException("End invalido");
     while(!queqe.isEmpty()){
         Pair aux = queqe.remove(0);
         visited.add(aux);
-        if (color==0 && aux.fst()==6)
+        if (color==0 && aux.fst()==end)
             return 7;
-        if (color==0 && result < aux.fst()+1)
+        if (color==0 && end == 6 && result < aux.fst()+1)
+            result = aux.fst()+1;
+        if (color==0 && end == 0 && result > aux.fst())
             result = aux.fst();
-        if (color==1 && aux.snd()==6)
+        if (color==1 && aux.snd()==end)
             return 7;
-        if (color==1 && result < aux.snd()+1)
-             result = aux.snd();
+        if (color==1 && end == 6 && result < aux.snd()+1)
+             result = aux.snd()+1;
+        if (color==1 && end == 0 && result > aux.snd())
+            result = aux.snd();
         List<Pair> succ = next(aux,color);
         while( !succ.isEmpty() ){
             Pair child = succ.remove(0);

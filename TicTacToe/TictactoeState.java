@@ -15,16 +15,6 @@ public class TictactoeState implements AdversarySearchState, Serializable {
         }
     }
 
-    public TictactoeState(int t,int[][] b) {
-        this.turn = t;
-        this.board = b;
-    }
-
-    public TictactoeState(TictactoeState original) {
-        this(original.turn+1,original.board);
-    }
-
-
     public boolean isMax(){
         return ((turn != 0) && (turn % 2 == 0));
     }
@@ -41,11 +31,18 @@ public class TictactoeState implements AdversarySearchState, Serializable {
         return board[i][j];
     }
 
-    public void setBoard(int i,int j,int move){
-        if (board[i][j] == -1)
-            board[i][j] = move;
-        else
-            throw new IllegalArgumentException("Movimiento invalido");
+    public boolean setBoard(int i,int j,int move){
+        boolean setted = false;
+        if(i<=2 && i>=0 && j<=2 && j>=0){
+            try{
+                if (board[i][j] == -1){
+                    turn++;
+                    board[i][j] = move;
+                    setted = true;
+                }
+            }catch(IllegalArgumentException e){}
+        }
+        return setted;
     }
 
 	

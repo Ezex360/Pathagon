@@ -81,7 +81,6 @@ public class Pathagon {
                     ok = game.addPiece(i,j,0);
                 }
             }
-            clearScreen();
             if(!pathagon.end(game)){
                 boolean ok = false;
                 while(!ok){
@@ -97,6 +96,7 @@ public class Pathagon {
                 }
             }
         }
+        clearScreen();
         System.out.println(game.toString());
         System.out.println("Fin del juego");
     }
